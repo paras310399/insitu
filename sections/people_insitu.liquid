@@ -1,0 +1,191 @@
+{{ 'section-rich-text.css' | asset_url | stylesheet_tag }}
+{{ 'custom.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div class="people_insitu_section">
+  <div class="isolate{% unless section.settings.full_width %} page-width{% endunless %}">
+    <div class="rich-text content-container color-{{ section.settings.color_scheme }} gradient{% if section.settings.full_width %} rich-text--full-width content-container--full-width{% endif %} section-{{ section.id }}-padding">
+      <div class="main_wrapper_pe">
+        <div class="section_image">
+          <div class="main-carousel-one">
+            {% for block in section.blocks %}
+              <div class="people_image_cover">
+                {% if block.settings.image %}
+                  {{
+                    block.settings.image
+                    | image_url: width: 1946
+                    | image_tag:
+                      loading: lazy,
+                      sizes: '246px, 493px, 600px, 713px, 823px, 990px, 1100px, 1206px, 1346px, 1426px, 1646px, 1946px'
+                  }}
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="section_content">
+          <div class="overline-text">{{ section.settings.overline_text }}</div>
+          <h2
+            class="rich-text__heading rte inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+            {{ section.shopify_attributes }}
+            {% if settings.animations_reveal_on_scroll %}
+              data-cascade
+              style="--animation-order: {{ forloop.index }};"
+            {% endif %}
+          >
+            {{ section.settings.heading }}
+          </h2>
+          <div
+            class="rich-text__text rte{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+            {{ section.shopify_attributes }}
+            {% if settings.animations_reveal_on_scroll %}
+              data-cascade
+              style="--animation-order: {{ forloop.index }};"
+            {% endif %}
+          >
+            {{ section.settings.text }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var elem = document.querySelector('.main-carousel-one');
+    if (elem) {
+      var flkty = new Flickity(elem, {
+        cellAlign: 'left',
+        contain: true,
+        prevNextButtons: false,
+        autoPlay: 1500,
+        pageDots: false,
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "peopleinsitu",
+  "class": "people_section",
+  "settings": [
+    {
+        "type": "inline_richtext",
+        "id": "heading",
+        "default": "People & Insitu",
+        "label": "Heading"
+      },
+      {
+        "type": "select",
+        "id": "heading_size",
+        "options": [
+          {
+            "value": "h2",
+            "label": "H2"
+          },
+          {
+            "value": "h1",
+            "label": "H1"
+          },
+          {
+            "value": "h0",
+            "label": "H0"
+          },
+          {
+            "value": "hxl",
+            "label": "HXL"
+          },
+          {
+            "value": "hxxl",
+            "label": "HXXL"
+          }
+        ],
+        "default": "h1",
+        "label": "Heading Size"
+      },
+     {
+        "type": "text",
+        "id": "overline_text",
+        "label": "Overline Text",
+        "info": "People & Insitu"
+      },
+      {
+        "type": "textarea",
+        "id": "text",
+        "label": "Section Text",
+        "info": "Add text for the section"
+       },
+    {
+    "type": "color_scheme",
+    "id": "color_scheme",
+    "label": "Color Scheme",
+    "default": "scheme-1"
+  },
+  {
+    "type": "checkbox",
+    "id": "full_width",
+    "default": true,
+    "label": "Full Width"
+  },
+  {
+    "type": "header",
+    "content": "Section Padding"
+  },
+  {
+    "type": "range",
+    "id": "padding_top",
+    "min": 0,
+    "max": 100,
+    "step": 4,
+    "unit": "px",
+    "label": "Padding Top",
+    "default": 40
+  },
+  {
+    "type": "range",
+    "id": "padding_bottom",
+    "min": 0,
+    "max": 100,
+    "step": 4,
+    "unit": "px",
+    "label": "Padding Bottom",
+    "default": 52
+  }
+  ],
+  "blocks": [
+  {
+    "type": "image_block",
+    "name": "Image Block",
+    "limit": 3,
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image"
+      }
+    ]
+  }
+],
+  "presets": [
+    {
+      "name": "People Insitu"
+    }
+  ]
+}
+{% endschema %}
+

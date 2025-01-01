@@ -1,0 +1,157 @@
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div class="content_slider_main content-container color-{{ section.settings.color_scheme }} gradient{% if section.settings.full_width %} content-container--full-width{% endif %} section-{{ section.id }}-padding">
+  <div class="isolate{% unless section.settings.full_width %} page-width{% endunless %} image_gallery">
+    <div class="info_slider">
+      <div class="carousel" data-flickity='{ "contain": true }'>
+        {%- for block in section.blocks -%}
+          <div class="carousel-slider">
+            <div class="inner_slider_wrapper">
+              {% if block.settings.image %}
+                <div class="image_cover">
+                  {{
+                    block.settings.image
+                    | image_url: width: 1946
+                    | image_tag:
+                      loading: lazy,
+                      sizes: sizes,
+                      widths: '246, 493, 600, 713, 823, 990, 1100, 1206, 1346, 1426, 1646, 1946'
+                  }}
+                </div>
+              {% endif %}
+
+              <div class="content_main">
+                {% if block.settings.content_title %}
+                  <div class="content_title">
+                    <h4 class="title">{{ block.settings.content_title }}</h4>
+                  </div>
+                {% endif %}
+                {% if block.settings.text %}
+                  <div
+                    class="rich-text__text rte{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+                    {{ block.shopify_attributes }}
+                    {% if settings.animations_reveal_on_scroll %}
+                      data-cascade
+                      style="--animation-order: {{ forloop.index }};"
+                    {% endif %}
+                  >
+                    {{ block.settings.text }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var elem = document.querySelector('.carousel');
+  var flkty = new Flickity(elem, {
+    cellAlign: window.outerWidth <= 768 ? 'center' : "left",
+    contain: true,
+    prevNextButtons: true,
+    pageDots: false
+  });
+
+  const scrollTriggers = document.querySelectorAll('.scroll-trigger');
+
+  window.addEventListener('scroll', function () {
+    scrollTriggers.forEach(function (trigger) {
+      const triggerPosition = trigger.getBoundingClientRect().top;
+      const windowHeight = window.innerHeight;
+
+      if (triggerPosition < windowHeight) {
+        trigger.classList.add('animate--slide-in');
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Content Slider",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-1"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "default": true,
+      "label": "t:sections.rich-text.settings.full_width.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 52
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slider",
+      "name": "slider",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "content_title",
+          "default": "t:sections.rich-text.blocks.heading.settings.heading.default",
+          "label": "t:sections.rich-text.blocks.heading.settings.heading.label"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "t:sections.rich-text.blocks.text.settings.text.default",
+          "label": "t:sections.rich-text.blocks.text.settings.text.label"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "content slider"
+    }
+  ]
+}
+{% endschema %}
